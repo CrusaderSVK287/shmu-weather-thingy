@@ -2,7 +2,7 @@
 
 ## Phase 1 – Basic Prototype
 
-* Poll SHMÚ for new CAP alerts every minute.
+* ✅ Poll SHMÚ for new CAP alerts every minute.
 * ✅ Download the latest CAP XML file(s). 
 * ✅ Parse the XML data. 
 * ✅ If an alert affects the configured district(s), display it in the terminal. 
