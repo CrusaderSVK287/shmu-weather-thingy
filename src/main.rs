@@ -1,6 +1,6 @@
 mod shmu_fetch;
 mod shmu_notifications;
-use std::{thread, time};
+use tokio::time::{sleep, Duration};
 
 
 use crate::{shmu_fetch::SHMUClient, shmu_notifications::SHMUNotification};
@@ -21,6 +21,6 @@ async fn main() {
             eprintln!("Error: {}", err);
         }
 
-        thread::sleep(time::Duration::from_secs(shmu_client.scan_period_secs));
+        sleep(Duration::from_secs(shmu_client.scan_period_secs)).await;
     }
 }

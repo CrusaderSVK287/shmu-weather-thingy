@@ -35,8 +35,8 @@ impl SHMUNotification {
 impl SHMUNotification {
     pub fn send(&self) {
         Toast::new(Toast::POWERSHELL_APP_ID)
-            .title(self.headline)
-            .text1(self.body)
+            .title(self.headline.as_str())
+            .text1(self.body.as_str())
             .sound(Some(Sound::SMS))
             .duration(Duration::Short)
             .show()

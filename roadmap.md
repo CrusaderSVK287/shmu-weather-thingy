@@ -19,8 +19,7 @@
 
 ## Phase 3 – Desktop Notifications
 
-* Add native desktop notifications for Windows and Linux.
-* Keep terminal output for debugging and logging.
+* ✅ Add native desktop notifications for Windows and Linux.
 
 ---
 
