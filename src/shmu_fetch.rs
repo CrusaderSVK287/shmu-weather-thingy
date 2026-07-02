@@ -20,24 +20,30 @@ const BASE_URL: &str =
 impl SHMUClient {
     pub fn new(seconds: u64) -> Self {
         Self {
-            last_fetched_url: "".to_string(),
+            last_fetched_url: String::from(""),
             scan_period_secs: seconds
         }
     }
 
-    pub async fn shmu_run_alert_scan(&self) -> Result<(), reqwest::Error> {
+    pub async fn shmu_run_alert_scan(&mut self) -> Result<(), reqwest::Error> {
         // 1. base directory
         let html = Self::shmu_get_html(BASE_URL).await?;
         let day = Self::extract_last_folder(&html)
             .expect("No day folder found");
         let day_url = format!("{BASE_URL}{day}/");
-        println!("Day: {day_url}");
 
         // 2. timestamp directory
         let day_html = Self::shmu_get_html(&day_url).await?;
         let timestamp = Self::extract_last_folder(&day_html)
             .expect("No timestamp folder found");
         let ts_url = format!("{day_url}{timestamp}/");
+
+        // 2.1 check if the timestamp folder is the same as last fetched folder, if yes, cancel
+        if ts_url == self.last_fetched_url {
+            println!("No new data found, fetching canceled");
+            return Ok(())
+        }
+        self.last_fetched_url = String::from(&ts_url);
         println!("Timestamp: {ts_url}");
 
         // 3. fetch XML directory

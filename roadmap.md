@@ -11,9 +11,9 @@
 
 ## Phase 2 – Avoid Duplicate Processing
 
-* Detect whether the fetched data is new.
-* Skip parsing if no new data is available.
-* Store processed alert IDs (or timestamps) to avoid handling the same alert multiple times.
+* ✅ Detect whether the fetched data is new.
+* ✅ Skip parsing if no new data is available.
+* ❔ Store processed alert IDs (or timestamps) to avoid handling the same alert multiple times. (Will see if this is done when fully implemented)
 
 ---
 
@@ -45,3 +45,8 @@
   * Discord
   * Email
 * Allow selecting one or more notification methods via configuration.
+
+# Needed Polish
+- remove blocking operations from async context. tokio expects avoid blocking the runtime thread
+- mixing async and blocking paradigms, look up timer-based scheduling or a stream-like
+- explore Option<T>, check last_fetched_url: String

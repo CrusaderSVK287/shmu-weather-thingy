@@ -1,11 +1,20 @@
 mod shmu_fetch;
+mod shmu_notifications;
 use std::{thread, time};
 
-use crate::shmu_fetch::SHMUClient;
+
+use crate::{shmu_fetch::SHMUClient, shmu_notifications::SHMUNotification};
 
 #[tokio::main]
 async fn main() {
-    let shmu_client = SHMUClient::new(10);
+    let mut shmu_client = SHMUClient::new(10);
+
+    let notif = SHMUNotification::new(
+    String::from("SHMU weather"),
+        String::from("Application started"), 
+        String::from("")
+    );
+    notif.send();
 
     loop {
         if let Err(err) = shmu_client.shmu_run_alert_scan().await {
