@@ -10,7 +10,7 @@ struct Alert {
 
 pub struct SHMUClient {
     last_fetched_url: String,
-    pub(crate) scan_period_secs: u64
+    scan_period_secs: u64
 }
 
 const BASE_URL: &str =
@@ -25,17 +25,32 @@ impl SHMUClient {
         }
     }
 
-    pub async fn shmu_run_alert_scan(&mut self) -> Result<(), reqwest::Error> {
+    pub fn scan_period(&self) -> u64 {
+        self.scan_period_secs
+    }
+
+    pub async fn run_alert_scan(&mut self) -> Result<(), reqwest::Error> {
         // 1. base directory
-        let html = Self::shmu_get_html(BASE_URL).await?;
-        let day = Self::extract_last_folder(&html)
-            .expect("No day folder found");
+        let html = Self::get_html(BASE_URL).await?;
+        let day = match Self::extract_last_folder(&html) {
+            Some(d) => d,
+            None => {
+                eprintln!("No day folder found");
+                return Ok(());
+            }
+        };
         let day_url = format!("{BASE_URL}{day}/");
 
         // 2. timestamp directory
-        let day_html = Self::shmu_get_html(&day_url).await?;
-        let timestamp = Self::extract_last_folder(&day_html)
-            .expect("No timestamp folder found");
+        let day_html = Self::get_html(&day_url).await?;
+
+        let timestamp = match Self::extract_last_folder(&day_html) {
+            Some(t) => t,
+            None => {
+                eprintln!("No timestamp folder found");
+                return Ok(());
+            }
+        };
         let ts_url = format!("{day_url}{timestamp}/");
 
         // 2.1 check if the timestamp folder is the same as last fetched folder, if yes, cancel
@@ -43,19 +58,19 @@ impl SHMUClient {
             println!("No new data found, fetching canceled");
             return Ok(())
         }
-        self.last_fetched_url = String::from(&ts_url);
+        self.last_fetched_url = ts_url.clone();
         println!("Timestamp: {ts_url}");
 
         // 3. fetch XML directory
-        let files_html = Self::shmu_get_html(&ts_url).await?;
+        let files_html = Self::get_html(&ts_url).await?;
         let files = Self::extract_xml_files(&files_html);
 
         // 4. loop through all XML files
         for file in files {
             let file_url = format!("{ts_url}{file}");
             println!("Fetching: {file_url}");
-            let xml = Self::shmu_get_html(&file_url).await?;
-            Self::handle_xml(&xml).await;
+            let xml = Self::get_html(&file_url).await?;
+            Self::handle_xml(&xml);
             // TODO: Put away this break, its just to not dos the opendata.shmu.sk server lol
             break;
         }
@@ -63,7 +78,7 @@ impl SHMUClient {
         Ok(())
     }
 
-    async fn shmu_get_html(url: &str) -> Result<String, reqwest::Error> {
+    async fn get_html(url: &str) -> Result<String, reqwest::Error> {
         reqwest::get(url).await?.text().await
     }
 
@@ -92,7 +107,7 @@ impl SHMUClient {
             .collect()
     }
 
-    async fn handle_xml(xml: &str) {
+    fn handle_xml(xml: &str) {
         let mut current_element: Option<String> = None;
 
         let mut alert = Alert {

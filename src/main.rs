@@ -10,17 +10,16 @@ async fn main() {
     let mut shmu_client = SHMUClient::new(10);
 
     let notif = SHMUNotification::new(
-    String::from("SHMU weather"),
-        String::from("Application started"), 
-        String::from("")
+    "SHMU weather",
+        "Application started"
     );
     notif.send();
 
     loop {
-        if let Err(err) = shmu_client.shmu_run_alert_scan().await {
+        if let Err(err) = shmu_client.run_alert_scan().await {
             eprintln!("Error: {}", err);
         }
 
-        sleep(Duration::from_secs(shmu_client.scan_period_secs)).await;
+        sleep(Duration::from_secs(shmu_client.scan_period())).await;
     }
 }
