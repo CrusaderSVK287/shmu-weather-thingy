@@ -1,0 +1,4 @@
+area = ["Dolný Kubín", "Tvrdošín", "Bratislava"]
+log_level = "info"
+period = 1
+

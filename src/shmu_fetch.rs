@@ -1,6 +1,7 @@
 use scraper::{Html, Selector};
 use xml::reader::{EventReader, XmlEvent};
 use log::{error, info};
+use crate::shmu_config::{Config};
 
 struct Alert {
     area_desc: String,
@@ -10,8 +11,7 @@ struct Alert {
 }
 
 pub struct SHMUClient {
-    last_fetched_url: String,
-    scan_period_secs: u64
+    last_fetched_url: String
 }
 
 const BASE_URL: &str =
@@ -19,18 +19,13 @@ const BASE_URL: &str =
 
 
 impl SHMUClient {
-    pub fn new(seconds: u64) -> Self {
+    pub fn new() -> Self {
         Self {
             last_fetched_url: String::from(""),
-            scan_period_secs: seconds
         }
     }
 
-    pub fn scan_period(&self) -> u64 {
-        self.scan_period_secs
-    }
-
-    pub async fn run_alert_scan(&mut self) -> Result<(), reqwest::Error> {
+    pub async fn run_alert_scan(&mut self, cfg: &Config) -> Result<(), reqwest::Error> {
         // 1. base directory
         let html = Self::get_html(BASE_URL).await?;
         let day = match Self::extract_last_folder(&html) {
@@ -71,11 +66,12 @@ impl SHMUClient {
             let file_url = format!("{ts_url}{file}");
             info!("Fetching: {file_url}");
             let xml = Self::get_html(&file_url).await?;
-            Self::handle_xml(&xml);
+            Self::handle_xml(&xml, cfg);
             // TODO: Put away this break, its just to not dos the opendata.shmu.sk server lol
-            break;
+            //break;
         }
 
+        info!("Finished scan of SHMU CAP alerts");
         Ok(())
     }
 
@@ -108,7 +104,7 @@ impl SHMUClient {
             .collect()
     }
 
-    fn handle_xml(xml: &str) {
+    fn handle_xml(xml: &str, cfg: &Config) {
         let mut current_element: Option<String> = None;
 
         let mut alert = Alert {
@@ -162,11 +158,11 @@ impl SHMUClient {
             }
         }
 
-        Self::process_area(&alert);
+        Self::process_area(&alert, cfg);
     }
 
-    fn process_area(alert: &Alert) {
-        if alert.area_desc != "Dolný Kubín" {
+    fn process_area(alert: &Alert, cfg: &Config) {
+        if !cfg.includes_area(&alert.area_desc) {
             return;
         }
 

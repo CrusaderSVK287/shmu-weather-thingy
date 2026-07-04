@@ -22,6 +22,7 @@ impl SHMUNotification {
         }
     }
 
+    #[allow(dead_code)]
     pub fn with_icon(headline: &str, body: &str, icon: &str) -> Self{
         Self {
             headline: String::from(headline), 
