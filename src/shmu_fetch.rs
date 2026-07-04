@@ -1,5 +1,6 @@
 use scraper::{Html, Selector};
 use xml::reader::{EventReader, XmlEvent};
+use log::{error, info};
 
 struct Alert {
     area_desc: String,
@@ -35,7 +36,7 @@ impl SHMUClient {
         let day = match Self::extract_last_folder(&html) {
             Some(d) => d,
             None => {
-                eprintln!("No day folder found");
+                error!("No day folder found");
                 return Ok(());
             }
         };
@@ -47,7 +48,7 @@ impl SHMUClient {
         let timestamp = match Self::extract_last_folder(&day_html) {
             Some(t) => t,
             None => {
-                eprintln!("No timestamp folder found");
+                error!("No timestamp folder found");
                 return Ok(());
             }
         };
@@ -55,11 +56,11 @@ impl SHMUClient {
 
         // 2.1 check if the timestamp folder is the same as last fetched folder, if yes, cancel
         if ts_url == self.last_fetched_url {
-            println!("No new data found, fetching canceled");
+            info!("No new data found, fetching canceled");
             return Ok(())
         }
         self.last_fetched_url = ts_url.clone();
-        println!("Timestamp: {ts_url}");
+        info!("Timestamp: {ts_url}");
 
         // 3. fetch XML directory
         let files_html = Self::get_html(&ts_url).await?;
@@ -68,7 +69,7 @@ impl SHMUClient {
         // 4. loop through all XML files
         for file in files {
             let file_url = format!("{ts_url}{file}");
-            println!("Fetching: {file_url}");
+            info!("Fetching: {file_url}");
             let xml = Self::get_html(&file_url).await?;
             Self::handle_xml(&xml);
             // TODO: Put away this break, its just to not dos the opendata.shmu.sk server lol
@@ -153,7 +154,7 @@ impl SHMUClient {
                 }
 
                 Err(e) => {
-                    eprintln!("Error: {e}");
+                    error!("Error: {e}");
                     break;
                 }
 
