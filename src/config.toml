@@ -1,4 +1,6 @@
-area = ["Dolný Kubín", "Tvrdošín", "Bratislava"]
+area = ["Dolný Kubín", "Tvrdošín", "Bratislava", "Ružomberok"]
 log_level = "info"
 period = 1
+include_description = false
 
+_fetch_only_one_alert = false

@@ -25,11 +25,11 @@
 
 ## Phase 4 – Configuration
 
-* Move hardcoded values into a configuration file.
+* ✅ Move hardcoded values into a configuration file.
 * Make the following configurable:
 
-  * Poll interval
-  * District(s) to monitor
+  * ✅ Poll interval
+  * ✅ District(s) to monitor
   * Warning/event types
   * Minimum warning severity
 

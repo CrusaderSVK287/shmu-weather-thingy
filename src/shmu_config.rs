@@ -1,14 +1,24 @@
 use serde::Deserialize;
 use toml;
 use std::fs;
+use log::{error};
 
 #[derive(Debug, Deserialize, Default)]
 #[serde(default)]
 pub struct Config {
+    // List of areas to handle
     area: Vec<String>,
-    log_level: String,
+    // level of logging
+    pub log_level: String,
+    // Period stating how often alerts should be pulled. In minutes
     #[serde(default = "default_period")]
     period: u64,
+    // Includes the long description in the notification body
+    pub include_description: bool,
+
+    // Debug configurations
+    // Fetch and handle only one alert, used in development to not overwhelm the shmu server
+    pub _fetch_only_one_alert: bool,
 }
 
 impl Config {
@@ -27,18 +37,18 @@ impl Config {
             area: Vec::new(),
             log_level: "error".to_string(),
             period: 60,
+            include_description: false,
+
+            _fetch_only_one_alert: false,
         }
     }
 
-    pub fn print(&self) {
+    pub fn _print(&self) {
         println!("{:?}", self.area);
         println!("{}", self.log_level);
         println!("{}", self.period);
     }
 
-    pub fn log_level(&self) -> &str {
-        self.log_level.as_str()
-    }
     pub fn period(&self) -> u64 {
         // The period is in minutes, hence why we multiply by 60
         self.period * 60
@@ -46,6 +56,16 @@ impl Config {
 
     pub fn includes_area(&self, area: &str) -> bool {
         self.area.contains(&area.to_string())
+    }
+
+    pub fn verify_config(&self) -> bool {
+        // Empty area means no alerts will be reported
+        if self.area.is_empty() {
+            error!("No area specified in the configuration, no alert would be handled");
+            return false;
+        }
+
+        true
     }
 }
 

@@ -2,13 +2,7 @@ use scraper::{Html, Selector};
 use xml::reader::{EventReader, XmlEvent};
 use log::{error, info};
 use crate::shmu_config::{Config};
-
-struct Alert {
-    area_desc: String,
-    event: String,
-    headline: String,
-    description: String,
-}
+use crate::shmu_alert::{Alert};
 
 pub struct SHMUClient {
     last_fetched_url: String
@@ -66,9 +60,16 @@ impl SHMUClient {
             let file_url = format!("{ts_url}{file}");
             info!("Fetching: {file_url}");
             let xml = Self::get_html(&file_url).await?;
-            Self::handle_xml(&xml, cfg);
-            // TODO: Put away this break, its just to not dos the opendata.shmu.sk server lol
-            //break;
+            let alert = Self::generate_alert_from_xml(&xml);
+            if cfg.includes_area(&alert.area_desc) {
+                alert.process(cfg);
+            }
+
+            // For debugging purposes, only fetch the first CAP, not all of them
+            if cfg._fetch_only_one_alert {
+                println!("DEBUG: Area of the first fetched alert: {a}", a = alert.area_desc);
+                break;
+            }
         }
 
         info!("Finished scan of SHMU CAP alerts");
@@ -104,15 +105,10 @@ impl SHMUClient {
             .collect()
     }
 
-    fn handle_xml(xml: &str, cfg: &Config) {
+    fn generate_alert_from_xml(xml: &str) -> Alert {
         let mut current_element: Option<String> = None;
 
-        let mut alert = Alert {
-            area_desc: String::new(),
-            event: String::new(),
-            headline: String::new(),
-            description: String::new(),
-        };
+        let mut alert = Alert::empty();
 
         let parser = EventReader::from_str(xml);
 
@@ -158,17 +154,6 @@ impl SHMUClient {
             }
         }
 
-        Self::process_area(&alert, cfg);
-    }
-
-    fn process_area(alert: &Alert, cfg: &Config) {
-        if !cfg.includes_area(&alert.area_desc) {
-            return;
-        }
-
-        println!("Area: {}", alert.area_desc);
-        println!("Event: {}", alert.event);
-        println!("Headline: {}", alert.headline);
-        //println!("Description: {}", alert.description);
+        alert
     }
 }
