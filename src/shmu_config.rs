@@ -2,6 +2,7 @@ use serde::Deserialize;
 use toml;
 use std::fs;
 use log::{error};
+use crate::shmu_alert::{AlertSeverity};
 
 #[derive(Debug, Deserialize, Default)]
 #[serde(default)]
@@ -17,6 +18,8 @@ pub struct Config {
     pub include_description: bool,
     // whether desltop notifications will be used or not, usefull for headless servers or silent running
     pub notifications: bool,
+    // Alert severity from which that and more sever alerts should be shown
+    pub min_severity: AlertSeverity,
 
     // Debug configurations
     // Fetch and handle only one alert, used in development to not overwhelm the shmu server
@@ -41,15 +44,14 @@ impl Config {
             period: 60,
             include_description: false,
             notifications: true,
+            min_severity: AlertSeverity::Mild, // this means all alerts will be shown
 
             _fetch_only_one_alert: false,
         }
     }
 
     pub fn _print(&self) {
-        println!("{:?}", self.area);
-        println!("{}", self.log_level);
-        println!("{}", self.period);
+        println!("{:#?}", self);
     }
 
     pub fn period(&self) -> u64 {
@@ -65,6 +67,10 @@ impl Config {
         // Empty area means no alerts will be reported
         if self.area.is_empty() {
             error!("No area specified in the configuration, no alert would be handled");
+            return false;
+        }
+        if self.min_severity == AlertSeverity::Unknown {
+            error!("min_severity is specified as Unknown, fix the configuration");
             return false;
         }
 

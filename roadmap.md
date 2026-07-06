@@ -31,7 +31,7 @@
   * ✅ Poll interval
   * ✅ District(s) to monitor
   * Warning/event types
-  * Minimum warning severity
+  * ✅ Minimum warning severity
   * Configuration file paths
 
 ---
@@ -50,3 +50,4 @@
 - remove blocking operations from async context. tokio expects avoid blocking the runtime thread
 - mixing async and blocking paradigms, look up timer-based scheduling or a stream-like
 - explore Option<T>, check last_fetched_url: String
+- Configuration: Fix panicking when invalid config. Check constructor. Also fix the case sensitivity for config... while not really a bug, its annoying

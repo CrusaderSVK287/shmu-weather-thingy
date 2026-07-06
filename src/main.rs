@@ -18,6 +18,7 @@ async fn main() {
             return;
         }
     };
+    //cfg._print();
     let mut shmu_client = SHMUClient::new();
     
     env_logger::Builder::from_env(Env::default().default_filter_or(&cfg.log_level)).init();    

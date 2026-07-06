@@ -1,8 +1,10 @@
+use std::str::FromStr;
+
 use scraper::{Html, Selector};
 use xml::reader::{EventReader, XmlEvent};
-use log::{error, info};
+use log::{error, info, warn};
 use crate::shmu_config::{Config};
-use crate::shmu_alert::{Alert};
+use crate::shmu_alert::{Alert, AlertSeverity};
 
 pub struct SHMUClient {
     last_fetched_url: String
@@ -61,7 +63,7 @@ impl SHMUClient {
             info!("Fetching: {file_url}");
             let xml = Self::get_html(&file_url).await?;
             let alert = Self::generate_alert_from_xml(&xml);
-            if cfg.includes_area(&alert.area_desc) {
+            if alert.should_handle(cfg) {
                 alert.process(cfg);
             }
 
@@ -136,6 +138,15 @@ impl SHMUClient {
                         }
                         Some("description") if alert.description.is_empty() => {
                             alert.description.push_str(text)
+                        }
+                        Some("severity") => {
+                            alert.severity = match AlertSeverity::from_str(text) {
+                                Ok(severity) => severity,
+                                Err(err) => {
+                                    warn!("Failed to set AlertSeverity: {err}");
+                                    AlertSeverity::Unknown
+                                }
+                            };
                         }
                         _ => {}
                     }
