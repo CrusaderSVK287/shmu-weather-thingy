@@ -30,6 +30,8 @@ impl Alert {
             body.push_str(&self.description);
         }
 
-        SHMUNotification::new(&headline, &body).send();
+        if cfg.notifications {
+            SHMUNotification::new(&headline, &body).send();
+        }
     }
 }

@@ -2,5 +2,7 @@ area = ["Dolný Kubín", "Tvrdošín", "Bratislava", "Ružomberok"]
 log_level = "info"
 period = 1
 include_description = false
+alert_severity = "severe"
+notifications = true
 
-_fetch_only_one_alert = false
+_fetch_only_one_alert = true

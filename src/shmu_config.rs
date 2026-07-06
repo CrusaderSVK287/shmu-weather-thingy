@@ -15,6 +15,8 @@ pub struct Config {
     period: u64,
     // Includes the long description in the notification body
     pub include_description: bool,
+    // whether desltop notifications will be used or not, usefull for headless servers or silent running
+    pub notifications: bool,
 
     // Debug configurations
     // Fetch and handle only one alert, used in development to not overwhelm the shmu server
@@ -38,6 +40,7 @@ impl Config {
             log_level: "error".to_string(),
             period: 60,
             include_description: false,
+            notifications: true,
 
             _fetch_only_one_alert: false,
         }

@@ -32,6 +32,7 @@
   * ✅ District(s) to monitor
   * Warning/event types
   * Minimum warning severity
+  * Configuration file paths
 
 ---
 
