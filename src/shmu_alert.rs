@@ -1,10 +1,10 @@
 use log::info;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{shmu_config::Config, shmu_notifications::SHMUNotification};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-#[derive(Deserialize, Default)]
+#[derive(Deserialize, Default, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum AlertSeverity {
     #[default]

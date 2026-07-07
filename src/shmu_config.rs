@@ -1,10 +1,13 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use toml;
-use std::fs;
+use std::{fs, path::Path};
 use log::{error};
+use std::io;
+use directories::ProjectDirs;
 use crate::shmu_alert::{AlertSeverity, AlertType};
+use crate::shmu_default_config::DEFAULT_CONFIG;
 
-#[derive(Debug, Deserialize, Default)]
+#[derive(Debug, Deserialize, Default, Serialize)]
 #[serde(default)]
 pub struct Config {
     // List of areas to handle
@@ -34,12 +37,45 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new() -> Result<Self, std::io::Error> {
-        // TODO: Add absolute path based on OS probably
-        let tom_text: String = fs::read_to_string("src/config.toml")?;
+    pub fn new() -> Result<Self, io::Error> {
+        let proj_dirs = ProjectDirs::from(
+            "com",
+            "CrusaderSVK287",
+            "SHMU_CAP_Weather_Alert_Monitor",
+        )
+        .ok_or_else(|| {
+            io::Error::new(
+                io::ErrorKind::NotFound,
+                "Could not determine config directory",
+            )
+        })?;
 
-        let config: Config = toml::from_str(tom_text.as_str()).unwrap();
+        let config_dir = proj_dirs.config_dir();
+        let config_path = config_dir.join("config.toml");
+
+        fs::create_dir_all(config_dir)?;
+
+        if !config_path.exists() {
+            Self::create_default_configuration_file(&config_path)?;
+        }
+
+        let toml_text = fs::read_to_string(config_path)?;
+
+        let config: Config = toml::from_str(&toml_text)
+            .map_err(|e| {
+                io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    format!("Invalid configuration: {e}"),
+                )
+            })?;
+
         Ok(config)
+    }
+
+    fn create_default_configuration_file(path: &Path) -> Result<(), io::Error> {
+        fs::write(path, DEFAULT_CONFIG)?;
+
+        Ok(())
     }
 
     // serde default
