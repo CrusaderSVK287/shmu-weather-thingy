@@ -4,7 +4,7 @@ use scraper::{Html, Selector};
 use xml::reader::{EventReader, XmlEvent};
 use log::{error, info, warn};
 use crate::shmu_config::{Config};
-use crate::shmu_alert::{Alert, AlertSeverity};
+use crate::shmu_alert::{Alert, AlertSeverity, AlertType};
 
 pub struct SHMUClient {
     last_fetched_url: String
@@ -109,6 +109,7 @@ impl SHMUClient {
 
     fn generate_alert_from_xml(xml: &str) -> Alert {
         let mut current_element: Option<String> = None;
+        let mut alert_type_found = false;
 
         let mut alert = Alert::empty();
 
@@ -147,6 +148,22 @@ impl SHMUClient {
                                     AlertSeverity::Unknown
                                 }
                             };
+                        }
+                        Some("valueName") => {
+                            if text == "awareness_type" {
+                                alert_type_found = true;
+                            }
+                        }
+                        Some("value") if alert_type_found => {
+                            alert_type_found = false;
+                            let n: u8 = text.split(';').next().unwrap().trim().parse().unwrap();
+                            alert.alert_type = match AlertType::try_from(n) {
+                                Ok(at) => at,
+                                Err(err) => {
+                                    warn!("Invalid alert type: {err}");
+                                    AlertType::Unknown
+                                }
+                            }
                         }
                         _ => {}
                     }

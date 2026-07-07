@@ -1,9 +1,13 @@
-area = ["Dolný Kubín", "Tvrdošín", "Bratislava", "Ružomberok"]
+area = ["Ružomberok"]
 log_level = "info"
 period = 1
 include_description = false
-# "Unknown", "Mild", "Moderate", "Severe", "Extreme"
+# "unknown", "mild", "moderate", "severe", "extreme"
 min_severity = "mild"
 notifications = true
 
+#alert_types = [1, 2, 3]
+#alert_types_is_allowlist = false
+
 _fetch_only_one_alert = true
+_print_alert_before_sending_notification = true

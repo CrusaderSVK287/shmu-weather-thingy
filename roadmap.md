@@ -26,13 +26,14 @@
 ## Phase 4 – Configuration
 
 * ✅ Move hardcoded values into a configuration file.
-* Make the following configurable:
+* ✅ Make the following configurable:
 
   * ✅ Poll interval
   * ✅ District(s) to monitor
-  * Warning/event types
+  * ✅ Warning/event types
   * ✅ Minimum warning severity
-  * Configuration file paths
+
+* Configuration file paths
 
 ---
 
@@ -51,3 +52,4 @@
 - mixing async and blocking paradigms, look up timer-based scheduling or a stream-like
 - explore Option<T>, check last_fetched_url: String
 - Configuration: Fix panicking when invalid config. Check constructor. Also fix the case sensitivity for config... while not really a bug, its annoying
+- custom icons for the notifications would be nice depending on the alert type
