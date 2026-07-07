@@ -13,7 +13,7 @@
 
 * ✅ Detect whether the fetched data is new.
 * ✅ Skip parsing if no new data is available.
-* ❔ Store processed alert IDs (or timestamps) to avoid handling the same alert multiple times. (Will see if this is done when fully implemented)
+* ❔ Store processed alert IDs (or timestamps) to avoid handling the same alert multiple times. (Example: <identifier>2.49.0.0.703.0.SK.260706081300.6a4b63a9_RK</identifier>) sqlite
 
 ---
 

@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use chrono::{DateTime, Utc};
 use scraper::{Html, Selector};
 use xml::reader::{EventReader, XmlEvent};
 use log::{error, info, warn};
@@ -163,6 +164,20 @@ impl SHMUClient {
                                     warn!("Invalid alert type: {err}");
                                     AlertType::Unknown
                                 }
+                            }
+                        }
+                        Some("onset") => {
+                            if let Ok(dt) = DateTime::parse_from_rfc3339(text) {
+                                alert.event_begins = dt.with_timezone(&Utc);
+                            } else {
+                                warn!("Failed to parse onset '{}'", text);
+                            }
+                        }
+                        Some("expires") => {
+                            if let Ok(dt) = DateTime::parse_from_rfc3339(text) {
+                                alert.event_end = dt.with_timezone(&Utc);
+                            } else {
+                                warn!("Failed to parse onset '{}'", text);
                             }
                         }
                         _ => {}

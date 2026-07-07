@@ -1,5 +1,6 @@
 use log::info;
 use serde::{Deserialize, Serialize};
+use chrono::{self, DateTime, Utc};
 
 use crate::{shmu_config::Config, shmu_notifications::SHMUNotification};
 
@@ -88,7 +89,9 @@ pub struct Alert {
     pub headline: String,
     pub description: String,
     pub severity: AlertSeverity,
-    pub alert_type: AlertType
+    pub alert_type: AlertType,
+    pub event_begins: DateTime<Utc>,
+    pub event_end: DateTime<Utc>
 }
 
 impl Alert {
@@ -100,6 +103,8 @@ impl Alert {
             description: String::new(),
             severity: AlertSeverity::Unknown,
             alert_type: AlertType::Unknown,
+            event_begins: Utc::now(),
+            event_end: Utc::now()
         }
     }
 
@@ -108,12 +113,20 @@ impl Alert {
             println!("{:#?}", self);
         }
 
+        // headline of the notification, location and event
         let mut headline = String::new();
         headline.push_str(&self.area_desc);
         headline.push_str(": ");
         headline.push_str(&self.event);
 
         let mut body = String::new();
+        // First goes the time when the event takes place
+        body.push_str(self.event_begins.format("%a %H:%M").to_string().as_str());
+        body.push_str(" - ");
+        body.push_str(self.event_end.format("%a %H:%M").to_string().as_str());
+        body.push('\n');
+        
+        // Body of the notification
         body.push_str(&self.headline);
         if cfg.include_description {
             body.push_str("\n\n");
