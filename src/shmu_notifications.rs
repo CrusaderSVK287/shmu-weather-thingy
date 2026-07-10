@@ -1,5 +1,6 @@
 #[cfg(any(target_os = "windows"))]
 use std::path::Path;
+use std::path::PathBuf;
 
 #[cfg(all(unix, not(target_os = "macos")))] 
 use notify_rust::{Notification}; 
@@ -43,14 +44,29 @@ impl SHMUNotification {
     }
 }
 
+fn notification_icon_path() -> PathBuf {
+    let path = std::env::temp_dir().join("shmu-weather-wind.png");
+
+    // Only write the file once.
+    if !path.exists() {
+        std::fs::write(&path, WIND_ICON)
+            .expect("failed to write embedded notification icon");
+    }
+
+    path
+}
+
+static WIND_ICON: &[u8] = include_bytes!("../assets/icons/wind.png");
 // Methods that are OS specific for linux
 #[cfg(all(unix, not(target_os = "macos")))]
 impl SHMUNotification {
     fn display_notification(&self) -> Result<(), notify_rust::error::Error> {
+        let icon = format!("file://{}", notification_icon_path().display());
+
         Notification::new()
             .summary(&self.headline)
             .body(&self.body)
-            .icon(&self.icon)
+            .icon(&icon)
             .show()?;
 
         Ok(())
