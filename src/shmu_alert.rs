@@ -1,8 +1,8 @@
 use log::info;
 use serde::{Deserialize, Serialize};
 use chrono::{self, DateTime, Duration, Utc};
-
 use crate::{shmu_config::Config, shmu_notifications::SHMUNotification};
+use log::{error};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[derive(Deserialize, Default, Serialize)]
@@ -133,9 +133,17 @@ impl Alert {
             body.push_str(&self.description);
         }
 
-        info!("Alert processed, sending notification if enabled");
+        info!("Alert processed");
         if cfg.notifications {
             SHMUNotification::new(&headline, &body, self.alert_type).send();
+        }
+        if cfg.push_notifications {
+            match SHMUNotification::send_push(cfg, &headline, &body) {
+                Ok(_) => (),
+                Err(e) => {
+                    error!("Failed to send push notification: {e}");
+                },
+            }
         }
     }
 

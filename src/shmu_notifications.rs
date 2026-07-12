@@ -1,6 +1,8 @@
+use ntfy::prelude::*;
+
 #[cfg(any(target_os = "windows"))]
 use std::path::Path;
-use crate::{shmu_alert::{AlertType}, shmu_icons::icon_path};
+use crate::{shmu_alert::AlertType, shmu_config::Config, shmu_icons::icon_path};
 
 #[cfg(all(unix, not(target_os = "macos")))] 
 use notify_rust::{Notification}; 
@@ -33,6 +35,22 @@ impl SHMUNotification {
                 eprintln!("Failed to display notification: {:?}", e);
             }
         }
+    }
+
+    pub fn send_push(cfg: &Config, headline: &str, body: &str) -> Result<(), Error> {
+        let dispatcher = dispatcher::builder("https://ntfy.sh").build_blocking()?; // Build dispatcher
+
+        let payload = Payload::new(cfg.ntfy_topic.as_str())
+            .message(String::from(body))
+            .title(String::from(headline))
+            .tags(["warning"]) 
+            .priority(Priority::Default)
+            .click(Url::parse("http://www.shmu.sk/?page=987")?)
+            .markdown(true);
+
+        dispatcher.send(&payload)?;
+
+        Ok(())
     }
 }
 

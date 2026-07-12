@@ -32,6 +32,11 @@ pub struct Config {
     pub notify_within: i64,
     // Notify when the event is already in effect
     pub notify_ongoing: bool,
+    // Enable push notification or not
+    pub push_notifications: bool,
+    // ntfy topic name
+    pub ntfy_topic: String,
+
 
     // Debug configurations
     // Fetch and handle only one alert, used in development to not overwhelm the shmu server
@@ -96,6 +101,8 @@ impl Config {
             alert_types_is_allowlist: false,
             notify_within: 24,
             notify_ongoing: false,
+            push_notifications: false,
+            ntfy_topic: String::from("SHMU_CAP_Weather_Alert_Monitor_faac3c87"),
 
             _fetch_only_one_alert: false,
             _print_alert_before_sending_notification: false,

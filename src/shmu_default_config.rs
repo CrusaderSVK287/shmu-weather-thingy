@@ -30,6 +30,12 @@ notify_within = 24
 # Notify when the event is already in effect
 notify_ongoing = false
 
+# Push notifications via ntfy on topic SHMU_CAP_Weather_Alert_Monitor_faac3c87
+push_notifications = false
+
+# ntfy topic to which push notifications will be sent to
+ntfy_topic = "SHMU_CAP_Weather_Alert_Monitor_faac3c87"
+
 # Minimum alert severity to process.
 # Available values:
 # - "mild"

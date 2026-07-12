@@ -39,21 +39,8 @@
 ---
 
 ## Phase 5 – Remote Notifications
-
-* Add additional notification backends, such as:
-
-  * ntfy
-  * Telegram
-  * Discord
-  * Email
-* Allow selecting one or more notification methods via configuration.
-
-# Needed Polish
-- remove blocking operations from async context. tokio expects avoid blocking the runtime thread
-- mixing async and blocking paradigms, look up timer-based scheduling or a stream-like
-- explore Option<T>, check last_fetched_url: String
-- Configuration: Fix panicking when invalid config. Check constructor. Also fix the case sensitivity for config... while not really a bug, its annoying
-- custom icons for the notifications would be nice depending on the alert type
+* ✅ntfy
+* ✅Configurable ntfy topic name
 
 # Icons
 - ✅api to handle icons.
@@ -73,3 +60,9 @@
   - ✅Rain Flood
   - ✅Marine Hazard
   - ✅Drought
+
+# Needed Polish
+- remove blocking operations from async context. tokio expects avoid blocking the runtime thread
+- mixing async and blocking paradigms, look up timer-based scheduling or a stream-like
+- explore Option<T>, check last_fetched_url: String
+- Configuration: Fix panicking when invalid config. Check constructor. Also fix the case sensitivity for config... while not really a bug, its annoying
