@@ -32,6 +32,7 @@
   * ✅ District(s) to monitor
   * ✅ Warning/event types
   * ✅ Minimum warning severity
+  * How many hours before the start of an event a notification should be sent (for example allert is issued in sunday but event starts wednesday)
 
 * Configuration file paths
 
@@ -53,3 +54,22 @@
 - explore Option<T>, check last_fetched_url: String
 - Configuration: Fix panicking when invalid config. Check constructor. Also fix the case sensitivity for config... while not really a bug, its annoying
 - custom icons for the notifications would be nice depending on the alert type
+
+# Icons
+- api to handle icons.
+- Individual icons:
+  - ✅ Wind
+  - ✅ Snow and Ice
+  - ✅ Thunderstorm
+  - Fog
+  - High Temperature
+  - Low Temperature
+  - Coastal Event
+  - ✅ Forest Fire
+  - ✅ Avalanches
+  - ✅ Rain
+  - ✅ Unknown (legacy value)
+  - Flooding
+  - Rain Flood
+  - Marine Hazard
+  - Drought

@@ -1,6 +1,9 @@
 #[cfg(any(target_os = "windows"))]
 use std::path::Path;
 use std::path::PathBuf;
+use crate::shmu_icons;
+#[cfg(all(unix, not(target_os = "macos")))]
+use crate::{shmu_alert::AlertType, shmu_icons::icon_path};
 
 #[cfg(all(unix, not(target_os = "macos")))] 
 use notify_rust::{Notification}; 
@@ -10,7 +13,6 @@ use winrt_notification::{Duration, IconCrop, Sound, Toast};
 pub struct SHMUNotification {
     headline: String,
     body: String,
-    icon: String,
 }
 
 // Methods common for both windows and linux
@@ -18,17 +20,7 @@ impl SHMUNotification {
     pub fn new(headline: &str, body: &str) -> Self{
         Self {
             headline: String::from(headline), 
-            body: String::from(body),
-            icon: String::new()
-        }
-    }
-
-    #[allow(dead_code)]
-    pub fn with_icon(headline: &str, body: &str, icon: &str) -> Self{
-        Self {
-            headline: String::from(headline), 
-            body: String::from(body),
-            icon: String::from(icon)
+            body: String::from(body)
         }
     }
 
@@ -44,29 +36,14 @@ impl SHMUNotification {
     }
 }
 
-fn notification_icon_path() -> PathBuf {
-    let path = std::env::temp_dir().join("shmu-weather-wind.png");
-
-    // Only write the file once.
-    if !path.exists() {
-        std::fs::write(&path, WIND_ICON)
-            .expect("failed to write embedded notification icon");
-    }
-
-    path
-}
-
-static WIND_ICON: &[u8] = include_bytes!("../assets/icons/wind.png");
 // Methods that are OS specific for linux
 #[cfg(all(unix, not(target_os = "macos")))]
 impl SHMUNotification {
     fn display_notification(&self) -> Result<(), notify_rust::error::Error> {
-        let icon = format!("file://{}", notification_icon_path().display());
-
         Notification::new()
             .summary(&self.headline)
             .body(&self.body)
-            .icon(&icon)
+            .icon(icon_path(AlertType::Wind).as_str())
             .show()?;
 
         Ok(())
@@ -80,7 +57,7 @@ impl SHMUNotification {
         let res = Toast::new(Toast::POWERSHELL_APP_ID)
             .title(self.headline.as_str())
             .text1(self.body.as_str())
-            .icon(Path::new(&self.icon), IconCrop::Square, "")
+            .icon(Path::new(icon_path(AlertType::Wind).as_str()), IconCrop::Square, "")
             .sound(Some(Sound::SMS))
             .duration(Duration::Short)
             .show();

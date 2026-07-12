@@ -3,6 +3,7 @@ mod shmu_notifications;
 mod shmu_config;
 mod shmu_alert;
 mod shmu_default_config;
+mod shmu_icons;
 
 use env_logger::Env;
 use tokio::time::{sleep, Duration};
