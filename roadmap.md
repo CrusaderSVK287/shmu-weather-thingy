@@ -34,7 +34,7 @@
   * ✅ Minimum warning severity
   * How many hours before the start of an event a notification should be sent (for example allert is issued in sunday but event starts wednesday)
 
-* Configuration file paths
+* ✅Configuration file paths
 
 ---
 
@@ -57,19 +57,19 @@
 
 # Icons
 - api to handle icons.
-- Individual icons:
-  - ✅ Wind
-  - ✅ Snow and Ice
-  - ✅ Thunderstorm
-  - Fog
-  - High Temperature
-  - Low Temperature
-  - Coastal Event
-  - ✅ Forest Fire
-  - ✅ Avalanches
-  - ✅ Rain
-  - ✅ Unknown (legacy value)
-  - Flooding
-  - Rain Flood
-  - Marine Hazard
-  - Drought
+- ✅Individual icons:
+  - ✅Wind
+  - ✅Snow and Ice
+  - ✅Thunderstorm
+  - ✅Fog
+  - ✅High Temperature
+  - ✅Low Temperature
+  - ✅Coastal Event
+  - ✅Forest Fire
+  - ✅Avalanches
+  - ✅Rain
+  - ✅Unknown (legacy value)
+  - ✅Flooding
+  - ✅Rain Flood
+  - ✅Marine Hazard
+  - ✅Drought

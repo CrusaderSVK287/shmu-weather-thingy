@@ -1,9 +1,6 @@
 #[cfg(any(target_os = "windows"))]
 use std::path::Path;
-use std::path::PathBuf;
-use crate::shmu_icons;
-#[cfg(all(unix, not(target_os = "macos")))]
-use crate::{shmu_alert::AlertType, shmu_icons::icon_path};
+use crate::{shmu_alert::{AlertType}, shmu_icons::icon_path};
 
 #[cfg(all(unix, not(target_os = "macos")))] 
 use notify_rust::{Notification}; 
@@ -13,14 +10,17 @@ use winrt_notification::{Duration, IconCrop, Sound, Toast};
 pub struct SHMUNotification {
     headline: String,
     body: String,
+    icon: AlertType
 }
 
 // Methods common for both windows and linux
 impl SHMUNotification {
-    pub fn new(headline: &str, body: &str) -> Self{
+    #[allow(dead_code)]
+    pub fn new(headline: &str, body: &str, icon: AlertType) -> Self{
         Self {
             headline: String::from(headline), 
-            body: String::from(body)
+            body: String::from(body),
+            icon: icon
         }
     }
 
@@ -43,7 +43,7 @@ impl SHMUNotification {
         Notification::new()
             .summary(&self.headline)
             .body(&self.body)
-            .icon(icon_path(AlertType::Wind).as_str())
+            .icon(icon_path(self.icon).as_str())
             .show()?;
 
         Ok(())
@@ -54,11 +54,12 @@ impl SHMUNotification {
 #[cfg(target_os = "windows")]
 impl SHMUNotification {
     fn display_notification(&self) -> Result<(), winrt_notification::Error>{
+
         let res = Toast::new(Toast::POWERSHELL_APP_ID)
             .title(self.headline.as_str())
             .text1(self.body.as_str())
-            .icon(Path::new(icon_path(AlertType::Wind).as_str()), IconCrop::Square, "")
-            .sound(Some(Sound::SMS))
+            .icon(Path::new(icon_path(self.icon).as_str()), IconCrop::Square, "")
+            .sound(Some(Sound::Reminder))
             .duration(Duration::Short)
             .show();
         res

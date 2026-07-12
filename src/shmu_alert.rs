@@ -135,7 +135,7 @@ impl Alert {
 
         info!("Alert processed, sending notification if enabled");
         if cfg.notifications {
-            SHMUNotification::new(&headline, &body).send();
+            SHMUNotification::new(&headline, &body, self.alert_type).send();
         }
     }
 
