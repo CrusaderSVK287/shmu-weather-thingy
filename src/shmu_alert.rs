@@ -1,6 +1,6 @@
 use log::info;
 use serde::{Deserialize, Serialize};
-use chrono::{self, DateTime, Utc};
+use chrono::{self, DateTime, Duration, Utc};
 
 use crate::{shmu_config::Config, shmu_notifications::SHMUNotification};
 
@@ -151,6 +151,26 @@ impl Alert {
         // Alert type filtering
         if !cfg.should_handle_alert_type(self.alert_type) {
             return false
+        }
+
+        let now = Utc::now();
+
+        // Event already ended
+        if self.event_end <= now {
+            return false;
+        }
+
+        // Too far in the future
+        if self.event_begins > now + Duration::hours(cfg.notify_within) {
+            return false;
+        }
+
+        // Event is currently ongoing
+        if !cfg.notify_ongoing
+            && self.event_begins <= now
+            && now < self.event_end
+        {
+            return false;
         }
 
         true

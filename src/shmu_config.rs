@@ -28,6 +28,10 @@ pub struct Config {
     alert_types: Vec<u8>,
     // if false, alert_types filters out unwanted alerts, if true, only listed alerts are handled
     alert_types_is_allowlist: bool,
+    // Only notify if the event starts within the next X hours.
+    pub notify_within: i64,
+    // Notify when the event is already in effect
+    pub notify_ongoing: bool,
 
     // Debug configurations
     // Fetch and handle only one alert, used in development to not overwhelm the shmu server
@@ -90,6 +94,8 @@ impl Config {
             min_severity: AlertSeverity::Mild, // this means all alerts will be shown
             alert_types: Vec::new(),
             alert_types_is_allowlist: false,
+            notify_within: 24,
+            notify_ongoing: false,
 
             _fetch_only_one_alert: false,
             _print_alert_before_sending_notification: false,

@@ -24,6 +24,12 @@ include_description = false
 # Disable this for headless servers or silent operation.
 notifications = true
 
+# Only notify if the event starts within the next X hours
+notify_within = 24
+
+# Notify when the event is already in effect
+notify_ongoing = false
+
 # Minimum alert severity to process.
 # Available values:
 # - "mild"
