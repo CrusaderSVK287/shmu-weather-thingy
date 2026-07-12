@@ -36,6 +36,9 @@ pub struct Config {
     pub push_notifications: bool,
     // ntfy topic name
     pub ntfy_topic: String,
+    // Run the scan only once, handle alerts, then exit. Period does not matter if this is true
+    // Good for running via github actions
+    pub run_once: bool,
 
 
     // Debug configurations
@@ -103,6 +106,7 @@ impl Config {
             notify_ongoing: false,
             push_notifications: false,
             ntfy_topic: String::from("SHMU_CAP_Weather_Alert_Monitor_faac3c87"),
+            run_once: false,
 
             _fetch_only_one_alert: false,
             _print_alert_before_sending_notification: false,

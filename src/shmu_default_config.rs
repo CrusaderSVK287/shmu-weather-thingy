@@ -17,6 +17,10 @@ log_level = "warn"
 # Lower values provide faster updates but create more requests.
 period = 60
 
+# Run the scan only once, handle alerts, then exit. Period does not matter if this is true
+# Good for running via github actions
+run_once = false
+
 # Whether to include the full alert description in notification messages.
 include_description = false
 

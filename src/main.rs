@@ -36,6 +36,10 @@ async fn main() {
             error!("Error: {}", err);
         }
 
+        if cfg.run_once {
+            break
+        }
+
         sleep(Duration::from_secs(cfg.period())).await;
     }
 }
