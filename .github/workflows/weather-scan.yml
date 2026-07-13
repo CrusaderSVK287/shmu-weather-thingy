@@ -1,8 +1,13 @@
 name: Weather Scan
 
 on:
+  push:
+    branches:
+      - cicd/setting-up-runner
+
   schedule:
     - cron: "27 */6 * * *"
+
   workflow_dispatch:
 
 permissions:
