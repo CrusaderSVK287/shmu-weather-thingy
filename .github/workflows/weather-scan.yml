@@ -1,0 +1,39 @@
+name: Weather Scan
+
+on:
+  push:
+    branches:
+      - cicd/setting-up-runner
+
+  schedule:
+    - cron: "27 */6 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Create config
+        run: |
+          mkdir -p .ci
+          cat > .ci/config.toml <<'EOF'
+          ${{ secrets.RUNNER_CONFIG_TOML }}
+          EOF
+
+      - name: Run
+        run: ./target/release/shmu-weather-thingy -c .ci/config.toml
