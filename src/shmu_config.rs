@@ -50,22 +50,26 @@ pub struct Config {
 
 impl Config {
     pub fn new() -> Result<Self, io::Error> {
-        let proj_dirs = ProjectDirs::from(
-            "com",
-            "CrusaderSVK287",
-            "SHMU_CAP_Weather_Alert_Monitor",
-        )
-        .ok_or_else(|| {
-            io::Error::new(
-                io::ErrorKind::NotFound,
-                "Could not determine config directory",
+        let config_path = if let Some(path) = Self::config_path_from_args() {
+            path
+        } else {
+            let proj_dirs = ProjectDirs::from(
+                "com",
+                "CrusaderSVK287",
+                "SHMU_CAP_Weather_Alert_Monitor",
             )
-        })?;
+            .ok_or_else(|| {
+                io::Error::new(
+                    io::ErrorKind::NotFound,
+                    "Could not determine config directory",
+                )
+            })?;
 
-        let config_dir = proj_dirs.config_dir();
-        let config_path = config_dir.join("config.toml");
+            let config_dir = proj_dirs.config_dir();
+            fs::create_dir_all(config_dir)?;
 
-        fs::create_dir_all(config_dir)?;
+            config_dir.join("config.toml")
+        };
 
         if !config_path.exists() {
             Self::create_default_configuration_file(&config_path)?;
@@ -82,6 +86,15 @@ impl Config {
             })?;
 
         Ok(config)
+    }
+
+    fn config_path_from_args() -> Option<std::path::PathBuf> {
+        let args: Vec<String> = std::env::args().collect();
+
+        args.iter()
+            .position(|arg| arg == "-c" || arg == "--config")
+            .and_then(|pos| args.get(pos + 1))
+            .map(std::path::PathBuf::from)
     }
 
     fn create_default_configuration_file(path: &Path) -> Result<(), io::Error> {

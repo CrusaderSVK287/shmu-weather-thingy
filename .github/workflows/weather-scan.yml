@@ -30,9 +30,10 @@ jobs:
 
       - name: Create config
         run: |
-          mkdir -p ~/.config/shmu_weather_thingy
-          printf '%s' '${{ secrets.RUNNER_CONFIG_TOML }}' > ~/.config/shmu_weather_thingy/config.toml
-          cat ~/.config/shmu_weather_thingy/config.toml
+          mkdir -p .ci
+          cat > .ci/config.toml <<'EOF'
+          ${{ secrets.RUNNER_CONFIG_TOML }}
+          EOF
 
       - name: Run
-        run: ./target/release/shmu-weather-thingy
+        run: ./target/release/shmu-weather-thingy -c .ci/config.toml
