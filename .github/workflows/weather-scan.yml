@@ -6,7 +6,7 @@ on:
       - cicd/setting-up-runner
 
   schedule:
-    - cron: "27 */6 * * *"
+    - cron: "27 */2 * * *"
 
   workflow_dispatch:
 
