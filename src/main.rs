@@ -4,12 +4,13 @@ mod shmu_config;
 mod shmu_alert;
 mod shmu_default_config;
 mod shmu_icons;
+mod shmu_db;
 
 use env_logger::Env;
 use tokio::time::{sleep, Duration};
 use log::{error, info};
 
-use crate::{shmu_config::Config, shmu_fetch::SHMUClient};
+use crate::{shmu_config::Config, shmu_db::AlertDatabase, shmu_fetch::SHMUClient};
 
 #[tokio::main]
 async fn main() {
@@ -31,8 +32,24 @@ async fn main() {
         return;
     }
 
+    let db = match if cfg.persistent {
+        AlertDatabase::new(&cfg.db_path)
+    } else {
+        AlertDatabase::empty()
+    } {
+        Ok(db) => db,
+        Err(e) => {
+            eprintln!("Failed to initialize database: {}", e);
+            return;
+        }
+    };
+
+    if cfg.persistent {
+        let _ = db.clear_expired_alerts();
+    }
+
     loop {
-        if let Err(err) = shmu_client.run_alert_scan(&cfg).await {
+        if let Err(err) = shmu_client.run_alert_scan(&cfg, &db).await {
             error!("Error: {}", err);
         }
 

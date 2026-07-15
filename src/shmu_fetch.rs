@@ -6,6 +6,7 @@ use xml::reader::{EventReader, XmlEvent};
 use log::{error, info, warn};
 use crate::shmu_config::{Config};
 use crate::shmu_alert::{Alert, AlertSeverity, AlertType};
+use crate::shmu_db::AlertDatabase;
 
 pub struct SHMUClient {
     last_fetched_url: String
@@ -22,7 +23,7 @@ impl SHMUClient {
         }
     }
 
-    pub async fn run_alert_scan(&mut self, cfg: &Config) -> Result<(), reqwest::Error> {
+    pub async fn run_alert_scan(&mut self, cfg: &Config, db: &AlertDatabase) -> Result<(), reqwest::Error> {
         // 1. base directory
         let html = Self::get_html(BASE_URL).await?;
         let day = match Self::extract_last_folder(&html) {
@@ -64,8 +65,8 @@ impl SHMUClient {
             info!("Fetching: {file_url}");
             let xml = Self::get_html(&file_url).await?;
             let alert = Self::generate_alert_from_xml(&xml);
-            if alert.should_handle(cfg) {
-                alert.process(cfg);
+            if alert.should_handle(cfg, db) {
+                alert.process(cfg, db);
             }
 
             // For debugging purposes, only fetch the first CAP, not all of them
@@ -181,6 +182,9 @@ impl SHMUClient {
                             } else {
                                 warn!("Failed to parse onset '{}'", text);
                             }
+                        }
+                        Some("identifier") => {
+                            alert.id = String::from(text);
                         }
                         _ => {}
                     }

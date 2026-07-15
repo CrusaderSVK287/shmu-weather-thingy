@@ -86,4 +86,13 @@ alert_types = []
 #
 # This option has no effect when alert_types is empty.
 alert_types_is_allowlist = false
+
+# Enables persistent storage of handled alert IDs. When enabled, the application
+# remembers which alerts have already been processed between GitHub Actions runs,
+# preventing the same active alerts from being sent repeatedly.
+persistent = false
+
+# Filesystem path to the SQLite database used for persistent storage. This option
+# is only used when `persistant` is enabled.
+db_path = "alerts.db"
 "#;

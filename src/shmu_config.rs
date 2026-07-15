@@ -40,6 +40,13 @@ pub struct Config {
     // Good for running via github actions
     pub run_once: bool,
 
+    // Enables persistent storage of handled alert IDs. When enabled, the application
+    // remembers which alerts have already been processed between GitHub Actions runs,
+    // preventing the same active alerts from being sent repeatedly.
+    pub persistent: bool,
+    // Filesystem path to the SQLite database used for persistent storage. This option
+    // is only used when `persistant` is enabled.
+    pub db_path: String,
 
     // Debug configurations
     // Fetch and handle only one alert, used in development to not overwhelm the shmu server
@@ -120,6 +127,8 @@ impl Config {
             push_notifications: false,
             ntfy_topic: String::from("SHMU_CAP_Weather_Alert_Monitor_faac3c87"),
             run_once: false,
+            persistent: false,
+            db_path: String::from("alerts.db"),
 
             _fetch_only_one_alert: false,
             _print_alert_before_sending_notification: false,

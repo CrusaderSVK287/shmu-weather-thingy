@@ -1,7 +1,7 @@
 use log::info;
 use serde::{Deserialize, Serialize};
 use chrono::{self, DateTime, Duration, Utc};
-use crate::{shmu_config::Config, shmu_notifications::SHMUNotification};
+use crate::{shmu_config::Config, shmu_db::AlertDatabase, shmu_notifications::SHMUNotification};
 use log::{error};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -84,6 +84,7 @@ impl From<AlertType> for u8 {
 
 #[derive(Debug)]
 pub struct Alert {
+    pub id: String,
     pub area_desc: String,
     pub event: String,
     pub headline: String,
@@ -97,6 +98,7 @@ pub struct Alert {
 impl Alert {
     pub fn empty() -> Self {
         Self {
+            id: String::new(),
             area_desc: String::new(),
             event: String::new(),
             headline: String::new(),
@@ -108,7 +110,7 @@ impl Alert {
         }
     }
 
-    pub fn process(&self, cfg: &Config) {
+    pub fn process(&self, cfg: &Config, db: &AlertDatabase) {
         if cfg._print_alert_before_sending_notification {
             println!("{:#?}", self);
         }
@@ -134,6 +136,12 @@ impl Alert {
         }
 
         info!("Alert processed");
+        if cfg.persistent {
+            match db.insert_alert(&self.id, self.event_end) {
+                Ok(_) => (),
+                Err(e) => error!("Error inserting alert ID into database: {e}")
+            }
+        }
         if cfg.notifications {
             SHMUNotification::new(&headline, &body, self.alert_type).send();
         }
@@ -147,7 +155,7 @@ impl Alert {
         }
     }
 
-    pub fn should_handle(&self, cfg: &Config) -> bool {
+    pub fn should_handle(&self, cfg: &Config, db: &AlertDatabase) -> bool {
         // If severity not big enough, dont handle
         if self.severity < cfg.min_severity {
             return false
@@ -179,6 +187,20 @@ impl Alert {
             && now < self.event_end
         {
             return false;
+        }
+
+        // Alert already handled
+        if cfg.persistent {
+            if match db.has_alert(&self.id) {
+                Ok(b) => b,
+                Err(e) => {
+                    error!("Error inserting alert ID into database: {e}"); 
+                    false
+                }
+            } {
+                // If the database contains the alert, it was already handled, skip
+                return false;
+            }
         }
 
         true
